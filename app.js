@@ -27,7 +27,7 @@ app.use(logger());
 app.use(koaBody({
     multipart: true,
     formidable: {
-        uploadDir: path.join(__dirname, 'public'),
+        uploadDir: path.join(__dirname, config.FILES_PATH),
         keepExtensions: true,
         multiples: false,
         maxFileSize: config.MAX_FILE_SIZE * 1024,
@@ -51,12 +51,13 @@ app.use(async function (ctx, next) {
 
 // serve files from ./public
 
-app.use(serve(path.join(__dirname, '/public')));
+app.use(serve(path.join(__dirname, config.FILES_PATH)));
 
 // handle uploads
 
 router
-    .post('/api/v1/images', async (ctx, next) => {
+    .post('/', async (ctx, next) => {
+        // TODO: mime type filter
         const file = ctx.request.files.file;
         console.log('uploading %s %s -> %s', file.type, file.name, path.basename(file.path));
         ctx.body = {
