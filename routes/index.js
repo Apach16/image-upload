@@ -1,13 +1,14 @@
 const Router = require('koa-router');
 const path = require('path');
 const config = require('../config');
+const jwt = require('../middlewares/jwt');
 
 const router = new Router();
 
 // handle uploads
 
 router
-    .post('/', async (ctx, next) => {
+    .post('/', jwt, async (ctx, next) => {
         if (!ctx.request.files.image) {
             err = new Error('No file selected for upload');
             err.status = 400;
