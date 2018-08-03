@@ -8,18 +8,23 @@ const router = new Router();
 
 router
     .post('/', async (ctx, next) => {
-        // TODO: mime type filter
-        try {
-            const file = ctx.request.files.file;
-            console.log('file', file);
-            console.log('uploading %s %s -> %s', file.type, file.name, path.basename(file.path));
-            ctx.body = {
-                data: {
-                    image_url: `${config.APP_URL}/${path.basename(ctx.request.files.file.path)}`
-                }
-            };
-        } catch (e) {
-            throw e;
+        if (!ctx.request.files.image) {
+            err = new Error('No file selected for upload');
+            err.status = 400;
+            throw err;
         }
+        const image = ctx.request.files.image;
+        const mimetypes = ['image/png', 'image/jpeg', 'image/gif'];
+        if (!mimetypes.includes(image.type.toLocaleLowerCase())) {
+            err = new Error(`Invalid type of file ${image.type}`);
+            err.status = 400;
+            throw err;
+        }
+        console.log('uploading %s %s -> %s', image.type, image.name, path.basename(image.path));
+        ctx.body = {
+            data: {
+                image_url: `${config.APP_URL}/${path.basename(ctx.request.files.image.path)}`
+            }
+        };
     });
 module.exports = router
