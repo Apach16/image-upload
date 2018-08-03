@@ -9,11 +9,7 @@ Build container:
 
 Run sh command in contaner:
 
-`docker run --rm -it -p 3000:3000 image-upload sh`
-
-Run server:
-
-`npm start`
+`docker run -d -p 3000:3000 image-upload`
 
 App will run on `localhost:3000`. Port can be changed by setting `PORT` env variable.
 

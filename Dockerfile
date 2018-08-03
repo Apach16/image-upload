@@ -1,26 +1,26 @@
 # ---- base Node ----
-FROM node:carbon as base
-# create app folder
-WORKDIR /app
+FROM node:10-alpine as base
+WORKDIR /imageupload
+RUN apk update --no-cache
 
 # ---- Dependencies ----
-FROM base AS dependencies
-# copy package* files
-COPY package*.json ./
-# install app dependencies
-RUN npm install
+FROM base as node_modules
+COPY package-lock.json package.json ./
+RUN npm ci || npm install
 
-# ---- Build ----
-FROM dependencies AS build
-WORKDIR /app
-COPY src /app
+# ---- Copy projects ----
+FROM node_modules as copy_project
+COPY ./src ./src
+RUN rm package-lock.json package.json
 
-# ---- Release ----
-FROM node:8.11.3-alpine as release
-# create /app directory
-WORKDIR /app
-COPY --from=dependencies /app/package.json ./
-# install app dependencies
-RUN npm install
-COPY --from=build /app ./
-CMD [ "node", "app.js"]
+# ---- Local ----
+FROM copy_project as local
+COPY ./.env.local ./.env
+EXPOSE 3000
+CMD [ "node", "./src/app.js"]
+
+# ---- Production ----
+FROM copy_project as production
+COPY ./.env.production ./.env
+EXPOSE 3000
+CMD [ "node", "./src/app.js"]

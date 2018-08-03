@@ -9,6 +9,7 @@ const koaBody = require('koa-body');
 const cors = require('@koa/cors');
 const jwt = require('koa-jwt');
 const path = require('path');
+const fs = require('fs');
 const config = require('./config');
 const router = require('./routes');
 
@@ -23,7 +24,7 @@ app.use(logger());
 app.use(koaBody({
   multipart: true,
   formidable: {
-    uploadDir: path.join(__dirname, config.FILES_PATH),
+    uploadDir: path.join(config.FILES_PATH),
     keepExtensions: true,
     multiples: false,
     maxFileSize: config.MAX_FILE_SIZE * 1024,
@@ -63,9 +64,14 @@ app.use(async function (ctx, next) {
   };
 });
 
+console.log(__dirname);
+if (!fs.existsSync(config.FILES_PATH)) {
+  fs.mkdirSync(config.FILES_PATH);
+}
+
 // serve files from ./public
 
-app.use(serve(path.join(__dirname, config.FILES_PATH), {
+app.use(serve(path.join(config.FILES_PATH), {
   maxage: config.CACHE_MAX_AGE
 }));
 
