@@ -1,19 +1,10 @@
 version: "3.6"
 services: 
-  image-upload-local:
-    image: ${LOCAL}-image-upload:${VERSION}
+  image-upload:
+    image: ${ENVIRONMENT}-image-upload:${VERSION}
     build:
       context: ./
       dockerfile: Dockerfile
-      target: ${LOCAL}
+      target: ${ENVIRONMENT}
     ports:
       - "3000:3000"
-
-  image-upload-prod:
-    image: ${PRODUCTION}-image-upload:${VERSION}
-    build:
-      context: ./
-      dockerfile: Dockerfile
-      target: ${PRODUCTION}
-    ports:
-      - "4000:3000"

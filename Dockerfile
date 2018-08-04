@@ -1,26 +1,13 @@
-# ---- base Node ----
-FROM node:10-alpine as base
-WORKDIR /imageupload
-RUN apk update --no-cache
+# ---- Build ImageUpload ----
+FROM node:10-alpine as build_imageupload
+WORKDIR /opt/imageupload
 
-# ---- Dependencies ----
-FROM base as node_modules
+COPY ./ ./
 COPY package-lock.json package.json ./
 RUN npm ci || npm install
 
-# ---- Copy projects ----
-FROM node_modules as copy_project
-COPY ./ ./
-RUN rm package-lock.json package.json
-
-# ---- Local ----
-FROM copy_project as local
-COPY ./.env.local ./.env
-EXPOSE 3000
-CMD [ "node", "./app.js"]
-
-# ---- Production ----
-FROM copy_project as production
-COPY ./.env.production ./.env
+# ---- Build ImageUpload final image ----
+FROM node:10-alpine as imageupload
+COPY ./.env.example ./.env
 EXPOSE 3000
 CMD [ "node", "./app.js"]
