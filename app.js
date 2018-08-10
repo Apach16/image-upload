@@ -33,7 +33,7 @@ app.use(koaBody({
 
 // enable cors
 
-app.use(cors());
+// app.use(cors());
 
 // Custom 400, 401 and 404 errors handling
 
