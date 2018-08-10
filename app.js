@@ -33,7 +33,9 @@ app.use(koaBody({
 
 // enable cors
 
-// app.use(cors());
+app.use(cors({
+  allowedMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS'
+}));
 
 // Custom 400, 401 and 404 errors handling
 
