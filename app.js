@@ -6,7 +6,6 @@ const Koa = require('koa');
 const logger = require('koa-logger');
 const serve = require('koa-static');
 const koaBody = require('koa-body');
-const cors = require('@koa/cors');
 const path = require('path');
 const fs = require('fs');
 const config = require('./config');
@@ -32,10 +31,11 @@ app.use(koaBody({
 }));
 
 // enable cors
-
-app.use(cors({
-  allowedMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS'
-}));
+app.use(async (ctx, next) => {
+  if (ctx.method === 'OPTIONS') {
+    ctx.status = 204;
+  }
+});
 
 // Custom 400, 401 and 404 errors handling
 
