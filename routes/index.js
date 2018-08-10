@@ -22,9 +22,10 @@ router
             throw err;
         }
         console.log('uploading %s %s -> %s', image.type, image.name, path.basename(image.path));
+        host = config.APP_URL ? config.APP_URL : ctx.request.origin;
         ctx.body = {
             data: {
-                image_url: `${config.APP_URL}/${path.basename(ctx.request.files.image.path)}`
+                image_url: `${host}/${path.basename(ctx.request.files.image.path)}`
             }
         };
     });
