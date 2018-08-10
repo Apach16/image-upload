@@ -34,6 +34,8 @@ app.use(koaBody({
 app.use(async (ctx, next) => {
   if (ctx.method === 'OPTIONS') {
     ctx.status = 204;
+  } else {
+    await next();
   }
 });
 
