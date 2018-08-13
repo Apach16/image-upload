@@ -5,12 +5,11 @@
 const Koa = require('koa');
 const logger = require('koa-logger');
 const serve = require('koa-static');
-const koaBody = require('koa-body');
 const path = require('path');
 const fs = require('fs');
 const config = require('./config');
 const router = require('./routes');
-const errorHandler = require('./middlewares/errorHandler');
+const errorsHandler = require('./handlers/errors');
 
 const app = new Koa();
 
@@ -18,30 +17,9 @@ const app = new Koa();
 
 app.use(logger());
 
-// parse multipart requests
+// Custom 404 errors handling
 
-app.use(koaBody({
-  multipart: true,
-  formidable: {
-    uploadDir: path.join(__dirname, config.FILES_PATH),
-    keepExtensions: true,
-    multiples: false,
-    maxFileSize: config.MAX_FILE_SIZE * 1024,
-  }
-}));
-
-// enable cors
-app.use(async (ctx, next) => {
-  if (ctx.method === 'OPTIONS') {
-    ctx.status = 204;
-  } else {
-    await next();
-  }
-});
-
-// Custom 400, 401 and 404 errors handling
-
-app.use(errorHandler);
+app.use(errorsHandler);
 
 if (!fs.existsSync(path.join(__dirname, config.FILES_PATH))) {
   fs.mkdirSync(path.join(__dirname, config.FILES_PATH));
