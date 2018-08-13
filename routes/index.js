@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const fs = require('fs');
+const fse = require('fs-extra');
 const path = require('path');
 const config = require('../config');
 const jwt = require('../middleware/jwt');
@@ -26,19 +27,18 @@ function checkFileMimeType(ctx, image) {
 }
 
 function deleteFile(filePath) {
-    fs.unlink(filePath, err => {
-      if (err) {
-        console.log(`error while deleting temp file ${filePath}`)
-      }
-        console.log(`successfully deleted temp file ${filePath}`)
-    })
+  fs.unlink(filePath, err => {
+    if (err) {
+      console.log(`error while deleting temp file ${filePath}`)
+    }
+    console.log(`successfully deleted temp file ${filePath}`)
+  })
 }
 
 router
   .options('*', async (ctx, next) => {
     // pass options requests
-    ctx.status = 204;
-    await next();
+    return result(ctx)({}, 204);
   })
   .post('/', jwt, multipart, async (ctx, next) => {
     checkFileExists(ctx);
@@ -53,7 +53,7 @@ router
     if (fs.existsSync(imagePath)) {
       deleteFile(image.path);
     } else {
-      fs.renameSync(image.path, imagePath);
+      fse.moveSync(image.path, imagePath);
     }
 
     console.log('uploading %s %s -> %s', image.type, image.name, path.basename(imagePath));
