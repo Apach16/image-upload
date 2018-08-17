@@ -5,26 +5,10 @@ const path = require('path');
 const config = require('../config');
 const jwt = require('../middleware/jwt');
 const multipart = require('../middleware/multipart');
-const {
-  result,
-  error
-} = require('../handlers/response');
+const image = require('../middleware/image');
+const { result } = require('../handlers/response');
 
 const router = new Router();
-
-function checkFileExists(ctx) {
-  if (!ctx.request.files || !ctx.request.files.image) {
-    return error(ctx)('No file selected for upload', 422);
-  }
-}
-
-function checkFileMimeType(ctx, image) {
-  const mimetypes = ['image/png', 'image/jpeg', 'image/gif'];
-
-  if (!mimetypes.includes(image.type.toLocaleLowerCase())) {
-    return error(ctx)(`Invalid type of file ${image.type}`, 422);
-  }
-}
 
 function deleteFile(filePath) {
   fs.unlink(filePath, err => {
@@ -36,16 +20,13 @@ function deleteFile(filePath) {
 }
 
 router
+  // pass options requests
   .options('*', async (ctx, next) => {
-    // pass options requests
     return result(ctx)({}, 204);
   })
-  .post('/', jwt, multipart, async (ctx, next) => {
-    checkFileExists(ctx);
+  .post('/', jwt, multipart, image, async (ctx, next) => {
 
     const image = ctx.request.files.image;
-
-    checkFileMimeType(ctx, image);
 
     const ext = path.extname(image.path);
     const hash = image.hash;
